@@ -1,8 +1,8 @@
 package com.example.mysample.network
 
-import retrofit2.Response
+import com.example.mysample.ui.homeactivity.model.HotelModel
 
 interface NetworkCallback{
-    fun onSuccess(data:Response<*>)
+    fun onSuccess(data: Any)
     fun onError(t:Throwable)
 }

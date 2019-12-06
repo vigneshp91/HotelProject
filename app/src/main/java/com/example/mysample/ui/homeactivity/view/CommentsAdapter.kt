@@ -22,8 +22,8 @@ class CommentsAdapter(private val mData:ArrayList<HotelComments>):RecyclerView.A
     }
 
     override fun onBindViewHolder(holder: CommentViewHolder, position: Int) {
-       holder.user.text = mData[position].getUser()
-       holder.comments.text = mData[position].getComment()
+       holder.user.text = mData[position].user
+       holder.comments.text = mData[position].comment
    }
 }
 
