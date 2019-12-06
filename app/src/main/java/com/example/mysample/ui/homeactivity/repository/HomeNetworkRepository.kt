@@ -18,18 +18,15 @@ import retrofit2.Callback
 import retrofit2.Response
 import javax.inject.Inject
 
-class HomeRepository @Inject constructor(private val apiService: ApiService,
+class HomeNetworkRepository @Inject constructor(private val apiService: ApiService,
                                          val hotelDao: HotelDao,
                                          val hotelCommentsDao: HotelCommentsDao,
                                          val connectivityUtils: ConnectivityUtils):BaseRepository(){
 
 
     fun getHotelDataFromSource(callback: NetworkCallback) {
-        if (connectivityUtils.isConnectedToInternet()){
             getHoteData(apiService.getHotel(),callback,true)
-        }
-        else
-            getHoteData(hotelDao.getHotelDetails(),callback,false)
+
 
     }
     fun getHotelCommentsDataFromSource(callback: NetworkCallback) {

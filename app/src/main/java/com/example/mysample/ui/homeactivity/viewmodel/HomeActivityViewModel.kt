@@ -2,10 +2,13 @@ package com.example.mysample.ui.homeactivity.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.mysample.network.ConnectivityUtils
 import com.example.mysample.ui.homeactivity.model.HotelModel
-import com.example.mysample.ui.homeactivity.repository.HomeRepository
+import com.example.mysample.ui.homeactivity.repository.HomeNetworkRepository
 import com.example.mysample.network.NetworkCallback
 import com.example.mysample.ui.homeactivity.model.HotelComments
+import com.example.mysample.ui.homeactivity.repository.HomeLocalRepository
+import com.example.mysample.ui.homeactivity.repository.IRepoProvider
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -13,7 +16,10 @@ import javax.inject.Inject
  * Viewmodel for the home page
  */
 class HomeActivityViewModel@Inject constructor(
-                            val repository: HomeRepository) : ViewModel() {
+                            val repository: HomeNetworkRepository,
+                            val localrepository: HomeLocalRepository
+                            ,val connectivityUtils: ConnectivityUtils
+) : ViewModel(),IRepoProvider {
     var getHotelResponse : MutableLiveData<HotelModel> = MutableLiveData()
     var hotelComments : MutableLiveData<ArrayList<HotelComments>> = MutableLiveData()
     var apierror : MutableLiveData<Throwable> = MutableLiveData()
@@ -22,18 +28,15 @@ class HomeActivityViewModel@Inject constructor(
         /**
          * access repository to get data
          */
-        repository.getHotelDataFromSource(object : NetworkCallback {
-            override fun onSuccess(data: Any) {
-                getHotelResponse.value =data as HotelModel
-            }
+        if (connectivityUtils.isConnectedToInternet()) {
+            this.inRemoteRepository()
+        } else
+            this.inLocalRepository()
 
-            override fun onError(t: Throwable) {
-                apierror.value = t
-            }
 
-        })
+    }
 
-    }  fun getHotelCommentsData() {
+    fun getHotelCommentsData() {
         /**
          * access repository to get data
          */
@@ -49,6 +52,33 @@ class HomeActivityViewModel@Inject constructor(
 
         })
 
+    }
+
+
+    override fun inRemoteRepository() {
+        repository.getHotelDataFromSource(object : NetworkCallback {
+            override fun onSuccess(data: Any) {
+                getHotelResponse.value =data as HotelModel
+            }
+
+            override fun onError(t: Throwable) {
+                apierror.value = t
+            }
+
+        })
+    }
+
+    override fun inLocalRepository() {
+        localrepository.getHotelDataFromSource(object : NetworkCallback {
+            override fun onSuccess(data: Any) {
+                getHotelResponse.value =data as HotelModel
+            }
+
+            override fun onError(t: Throwable) {
+                apierror.value = t
+            }
+
+        })
     }
 
 }
