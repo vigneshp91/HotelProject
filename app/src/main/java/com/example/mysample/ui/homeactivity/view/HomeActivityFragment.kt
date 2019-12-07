@@ -24,6 +24,7 @@ import javax.inject.Inject
 class HomeActivityFragment : Fragment() {
 
     var mContext:Context? = null
+    var mComments:ArrayList<HotelComments>? = null
     @Inject
     internal lateinit var viewModelFactory: ViewModelProvider.Factory
 
@@ -32,7 +33,7 @@ class HomeActivityFragment : Fragment() {
             HomeActivityFragment()
     }
 
-    private lateinit var viewModel: HomeActivityViewModel
+    private  var viewModel: HomeActivityViewModel? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,25 +49,30 @@ class HomeActivityFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(HomeActivityViewModel::class.java)
-        viewModel = ViewModelProviders.of(this).get(HomeActivityViewModel::class.java)
+        viewModel = activity?.run {
+            ViewModelProviders.of(this,viewModelFactory).get(HomeActivityViewModel::class.java)
+        }
+        //viewModel = ViewModelProviders.of(this, viewModelFactory).get(HomeActivityViewModel::class.java)
         progress.visibility = View.VISIBLE
         data.visibility = View.GONE
-        viewModel.getHotelData()
+        viewModel?.getHotelData()
 
-        viewModel.getHotelResponse.observe(this, Observer {
+        viewModel?.getHotelResponse?.observe(this, Observer {
             initUi(it)
         })
 
-        viewModel.apierror.observe(this, Observer {
+        viewModel?.apierror?.observe(this, Observer {
             //Toast.makeText(mContext,"Something went wrong",Toast.LENGTH_LONG).show()
 
         })
+        if(!viewModel?.commentUpdated!!)
+            viewModel?.clearComments()
 
-        viewModel.getHotelCommentsData()
+        viewModel?.getHotelCommentsData()
 
-        viewModel.hotelComments.observe(this, Observer {
+        viewModel?.hotelComments?.observe(this, Observer {
             loadComments(it)
+
         })
     }
 
@@ -77,7 +83,13 @@ class HomeActivityFragment : Fragment() {
     }
 
     private fun loadComments(comments: ArrayList<HotelComments>) {
-        commentsList.adapter = CommentsAdapter(comments)
+        val adapter=CommentsAdapter(comments)
+        commentsList.adapter = adapter
+        adapter.notifyDataSetChanged()
+
+    }
+
+    public fun updateReview(comment:HotelComments){
 
     }
 

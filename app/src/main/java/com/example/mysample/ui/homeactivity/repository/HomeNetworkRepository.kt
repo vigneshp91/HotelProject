@@ -21,15 +21,19 @@ import javax.inject.Inject
 class HomeNetworkRepository @Inject constructor(private val apiService: ApiService,
                                          val hotelDao: HotelDao,
                                          val hotelCommentsDao: HotelCommentsDao,
-                                         val connectivityUtils: ConnectivityUtils):BaseRepository(){
+                                         val connectivityUtils: ConnectivityUtils):BaseRepository(),HomeRepositoryInterface{
 
 
-    fun getHotelDataFromSource(callback: NetworkCallback) {
+    override  fun getHotelDataFromSource(callback: NetworkCallback) {
+        if (connectivityUtils.isConnectedToInternet()){
             getHoteData(apiService.getHotel(),callback,true)
+        }
+        else
+            getHoteData(hotelDao.getHotelDetails(),callback,false)
 
 
     }
-    fun getHotelCommentsDataFromSource(callback: NetworkCallback) {
+    override fun getHotelCommentsDataFromSource(callback: NetworkCallback) {
         if (connectivityUtils.isConnectedToInternet()){
             getHoteCommentsData(apiService.getHotelComments(),callback,true)
         }
@@ -87,5 +91,6 @@ class HomeNetworkRepository @Inject constructor(private val apiService: ApiServi
 
             },disposable)
     }
+
 
 }

@@ -1,8 +1,12 @@
 package com.example.mysample.di.module
 
 import android.app.Application
+import com.example.mysample.local.dao.HotelCommentsDao
+import com.example.mysample.local.dao.HotelDao
 import com.example.mysample.network.ApiService
 import com.example.mysample.network.ConnectivityUtils
+import com.example.mysample.ui.homeactivity.repository.HomeNetworkRepository
+import com.example.mysample.ui.homeactivity.repository.HomeRepositoryInterface
 
 
 import com.google.gson.Gson
@@ -59,6 +63,12 @@ class ApiModule {
     @Singleton
     internal fun provideMovieApiService(retrofit: Retrofit): ApiService {
         return retrofit.create(ApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    internal fun provideHomeRepositoryInterface(apiService: ApiService,hotelDao: HotelDao,commentsDao: HotelCommentsDao,connectivityUtils: ConnectivityUtils): HomeRepositoryInterface {
+        return HomeNetworkRepository(apiService,hotelDao,commentsDao,connectivityUtils)
     }
 
     @Provides
