@@ -65,8 +65,7 @@ class HomeActivityFragment : Fragment() {
             //Toast.makeText(mContext,"Something went wrong",Toast.LENGTH_LONG).show()
 
         })
-        if(!viewModel?.commentUpdated!!)
-            viewModel?.clearComments()
+
 
         viewModel?.getHotelCommentsData()
 
